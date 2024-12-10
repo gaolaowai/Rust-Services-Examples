@@ -19,20 +19,20 @@ To you, dear reader, whomever you may be, I simply wish you a good day. Stick ar
 -- Max
 
 ## Project Components
--[] DNS --> controll your DNS, control your fate
--[] Proxy --> Catch and route requests to the appropriate handling service
--[] Firewall --> Catch and route to black hole or return infinite garbage
--[] CertificateAuthority --> Internally centralized certificate generation and authentication
--[] Email --> SMTP (sending, receiving), IMAP/POP (client interactions), and basic web GUI for sending, composing, reading, etc.
--[] NTP --> Maybe it will be the wrong (out of date) time, but at least all your services/systems are using the same timestamps, which makes investigating incidents much easier.
--[] Logging --> Need to know what's going on with your stuff, the good, the bad, the ugly, as well as searching/parsing it out.
--[] HTTP --> Always need HTTP(s) servers
--[] ADAP (User account services: creation, management, role management, authentication, etc.)
--[] Comms --> Chat, community posts, video/audio calling
--[] DBs (KV store, KV in-memory cache, SQL-like, immutable record store --> blockchain)
--[] Runner --> Sometimes you just need to run some jobs without caring who does it. Submit some work, get back results.
--[] Scheduling --> Deceivingly complex, every organization needs scheduling, whether it be for resource management, parties, or just to manage personal time.
--[] File server (bucket-style storage) --> Sometimes applications and services just need to store data blobs somewhere and access it in a variety of ways (SFTP, SSH, HTTPS, TLS-on-TCP)
+ - DNS --> controll your DNS, control your fate 
+ - Proxy --> Catch and route requests to the appropriate handling service
+ - Firewall --> Catch and route to black hole or return infinite garbage
+ - CertificateAuthority --> Internally centralized certificate generation and authentication
+ - Email --> SMTP (sending, receiving), IMAP/POP (client interactions), and basic web GUI for sending, composing, reading, etc.
+ - NTP --> Maybe it will be the wrong (out of date) time, but at least all your services/systems are using the same timestamps, which makes investigating incidents much easier.
+ - Logging --> Need to know what's going on with your stuff, the good, the bad, the ugly, as well as searching/parsing it out.
+ - HTTP --> Always need HTTP(s) servers
+ - ADAP (User account services: creation, management, role management, authentication, etc.)
+ - Comms --> Chat, community posts, video/audio calling
+ - DBs (KV store, KV in-memory cache, SQL-like, immutable record store --> blockchain)
+ - Runner --> Sometimes you just need to run some jobs without caring who does it. Submit some work, get back results.
+ - Scheduling --> Deceivingly complex, every organization needs scheduling, whether it be for resource management, parties, or just to manage personal time.
+ - File server (bucket-style storage) --> Sometimes applications and services just need to store data blobs somewhere and access it in a variety of ways (SFTP, SSH, HTTPS, TLS-on-TCP)
 
 ## Principles
 * Use minimum depencies. I want to avoid NPM/node style dependency trees with 10's of thousands of dependencies and giant build times. This not only helps make the code more secure from supply-side attacks (back-doored crates), but also makes it easier to certify/review if needed.
