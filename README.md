@@ -1,5 +1,12 @@
 # What is this?
-Examples of different services written in Rust with minimal dependencies where possible.
+Examples of different services written in Rust with minimal dependencies where possible. It is a work in progress.
+
+Even though this repository is in Rust, I can easily write similar code in Python, C, C++, Golang, Elixir, etc..., though I tend to avoid writing network/world-facing code in those languages for performance or security reasons. 
+
+I'm working to get generic examples of up-to-date Python and C or C++ code into my github which can show my abilities within those languages.
+
+Unfortunately most of my work in the past few years has been in private repositories.
+That work covers everything from Ai, computer vision, network services, data visualization and processing platforms, encrypted communications, streaming, etc... I'll need to produce some toy examples to illustrate that experience.
 
 # Why does this repo exist?
 Working in IT and software development, there are repeated common components that I've bumped into time and time again.
