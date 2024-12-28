@@ -1,5 +1,12 @@
 # What is this?
-Examples of different services written in Rust with minimal dependencies where possible.
+Examples of different services written in Rust with minimal dependencies where possible. It is a work in progress.
+
+Even though this repository is in Rust, I can easily write similar code in Python, C, C++, Golang, Elixir, etc..., though I tend to avoid writing network/world-facing code in those languages for performance or security reasons. 
+
+I'm working to get generic examples of up-to-date Python and C or C++ code into my github which can show my abilities within those languages.
+
+Unfortunately most of my work in the past few years has been in private repositories.
+That work covers everything from Ai, computer vision, network services, data visualization and processing platforms, encrypted communications, streaming, etc... I'll need to produce some toy examples to illustrate that experience.
 
 # Why does this repo exist?
 Working in IT and software development, there are repeated common components that I've bumped into time and time again.
@@ -42,3 +49,10 @@ To you, dear reader, whomever you may be, I simply wish you a good day. Stick ar
 * Be easy to build, install, deploy --> Don't make setup a game of 20 questions.
 * Overly comment code. Some folks have the opinion that the code should speak for itself, and sometimes they're right. But more often than not, I want someone who maybe isn't senior or fully experienced in Rust programming to be able to click through the source code and feel as if they understand, or could potentially understand what is going on. Don't assume that others are experts. Whenever I myself have to stop and deliberate between multiple different paths, to me, that marks a point where I should be documenting my decision making process, the alternatives I didn't choose, and why. After all, I'm human, and it's possible the road not taken ***actually*** was the correct path, but that we might not know it until several months years, or even decades after the fact. While working in codebases as Goldman Sachs, I particularly appreciated those tomes which did just this. Some programmer from 20 years ago didn't have to do it, but just when I thought I was being clever and could improve something, reading a good comment block from someone (or multiple someones sometimes) talking about how they also tried and failed to do something differently, probably saved weeks of wasted effort.
 * Avoid linking to libraries. Sure this might make my binary fatter, but like Golang, I'd rather aim at easy portability, which I think more closely adheres to my flavor of KISS.
+
+## Reference implementations of hashing, encryption, and signature generation
+* Hashing --> https://github.com/BLAKE3-team/BLAKE3/blob/master/reference_impl/reference_impl.rs
+* Encrypted Block signing --> https://github.com/RustCrypto/universal-hashes/blob/master/poly1305/src/backend/soft.rs
+* Encryption --> https://github.com/RustCrypto/stream-ciphers/blob/master/chacha20/src/chacha.rs
+* PRNG --> ChaCha8 or ChaCha12 using time and other ChaCha round. Needs more research.
+* Elliptic curve diffie helman for key exchange --> https://github.com/dalek-cryptography/curve25519-dalek/tree/main/x25519-dalek
