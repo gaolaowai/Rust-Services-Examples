@@ -4,7 +4,7 @@ use std::thread;
 use std::time::Duration;
 use std::str;
 
-use server::smtp;
+use server::smtp::{self, SMTPState};
 
 const PORT: &str = "2525";
 const DOMAIN: &str = "test.ourdomain.org";
@@ -36,9 +36,17 @@ fn handle_smtp(mut stream: TcpStream) -> std::io::Result<()> {
 
         let _state_result = smtp_object.check_for_state_change();
 
-        let _handling_result = smtp_object.handle_current_state();
+        let handling_result = smtp_object.handle_current_state();
 
         stream.write_all(&smtp_object.output_buffer).unwrap();
+
+        if let Some(action_state) = handling_result.unwrap() {
+            if action_state == SMTPState::QUIT {
+                stream.flush();
+                stream.shutdown(std::net::Shutdown::Both);
+                break;
+            }
+        }
     }
 
     Ok(())

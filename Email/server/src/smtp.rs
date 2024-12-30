@@ -13,7 +13,7 @@ struct SMTPObject {
 }
 
 #[derive(Default, Debug, PartialEq, Eq, Clone)]
-enum SMTPState {
+pub enum SMTPState {
     #[default] StartingState,
     UNSUPPORTED,
     DATA, // Respond with 354 if ok
@@ -93,7 +93,7 @@ impl SMTPStateMachine {
         Ok(())
     }
 
-    pub fn handle_current_state(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn handle_current_state(&mut self) -> Result<Option<SMTPState>, Box<dyn std::error::Error>> {
         let received = std::str::from_utf8(&self.input_buffer).unwrap_or("");
         let mut reader = BufReader::new(received.as_bytes());
         for line_result in reader.lines() {
@@ -111,7 +111,7 @@ impl SMTPStateMachine {
                     SMTPState::DATA => { self.output_buffer = b"354 Continue\r\n".to_vec(); self.in_message = true;},
                     SMTPState::RSET => { self.output_buffer = b"250 Ok reset\r\n".to_vec();},
                     SMTPState::NOOP => { self.output_buffer = b"250 Ok noop\r\n".to_vec(); },
-                    SMTPState::QUIT => { self.output_buffer = b"221 Ok\r\n".to_vec();  },
+                    SMTPState::QUIT => { self.output_buffer = b"221 Ok\r\n".to_vec(); return Ok(Some(SMTPState::QUIT)); },
                     _ => { self.output_buffer = b"502 Command Not Implemented\r\n".to_vec(); },
                 }
             } else {
@@ -125,7 +125,7 @@ impl SMTPStateMachine {
             }
         }
 
-        Ok(())
+        Ok(None)
 
     }
 
