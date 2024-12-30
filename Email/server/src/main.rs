@@ -32,9 +32,13 @@ fn handle_smtp(mut stream: TcpStream) -> std::io::Result<()> {
             break;
         }
 
-        let _result = smtp_object.load_buffer(&buffer[..bytes_read]);
+        let _load_result = smtp_object.load_buffer(&buffer[..bytes_read]);
 
-        let _result = smtp_object
+        let _state_result = smtp_object.check_for_state_change();
+
+        let _handling_result = smtp_object.handle_current_state();
+
+        stream.write_all(&smtp_object.output_buffer).unwrap();
     }
 
     Ok(())
