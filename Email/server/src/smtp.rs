@@ -6,8 +6,8 @@ use std::io::{BufRead, BufReader, Read};
 //
 #[derive(Default, Debug, Clone)]
 struct SMTPObject {
-    to: String,
-    from: Vec<String>,
+    to: Vec<String>,
+    from: String,
     body: String,
     attachments: Vec<Vec<u8>>
 }
@@ -101,15 +101,15 @@ impl SMTPStateMachine {
             if !self.in_message {
                 println!("C: {}", line);
 
-                let command = line.to_uppercase();
-                let parts: Vec<&str> = command.split_whitespace().collect();
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                println!("parts: {:?}", parts);
 
                 match self.current_state {
                     SMTPState::HELO => { self.output_buffer = b"250 Ok\r\n".to_vec(); },
-                    SMTPState::MAILFROM => { self.output_buffer = b"250 Ok\r\n".to_vec(); },
-                    SMTPState::RCPTTO => { self.output_buffer = b"250 Ok recipient\r\n".to_vec(); },
+                    SMTPState::MAILFROM => { self.output_buffer = b"250 Ok\r\n".to_vec(); self.mail_object.from = parts[1].to_string();},
+                    SMTPState::RCPTTO => { self.output_buffer = b"250 Ok recipient\r\n".to_vec(); self.mail_object.to.push(parts[1].to_string()); },
                     SMTPState::DATA => { self.output_buffer = b"354 Continue\r\n".to_vec(); self.in_message = true;},
-                    SMTPState::RSET => { self.output_buffer = b"250 Ok reset\r\n".to_vec();},
+                    SMTPState::RSET => { self.output_buffer = b"250 Ok reset\r\n".to_vec(); self.mail_object = SMTPObject::default(); },
                     SMTPState::NOOP => { self.output_buffer = b"250 Ok noop\r\n".to_vec(); },
                     SMTPState::QUIT => { self.output_buffer = b"221 Ok\r\n".to_vec(); return Ok(Some(SMTPState::QUIT)); },
                     _ => { self.output_buffer = b"502 Command Not Implemented\r\n".to_vec(); },
@@ -121,9 +121,13 @@ impl SMTPStateMachine {
                     self.output_buffer = b"250 Ok\r\n".to_vec();
                     // stream.write_all(bufferout.as_bytes())?;
                     self.in_message = false;
+                    println!("EMAIL TO SEND:\n\n{:?}\n\n", self.mail_object);
+                } else {
+                    self.mail_object.body.push_str(&std::str::from_utf8(&self.input_buffer).unwrap());
                 }
             }
         }
+        self.input_buffer.clear();
 
         Ok(None)
 

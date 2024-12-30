@@ -17,7 +17,7 @@ fn handle_smtp(mut stream: TcpStream) -> std::io::Result<()> {
     let mut buffer = [0; BUF_SIZE];
     let mut inmessage = false;
 
-    let mut bufferout = format!("220 {} SMTP CCSMTP\r\n", DOMAIN);
+    let mut bufferout = format!("220 {} SMTP\r\n", DOMAIN);
     print!("{}", bufferout);
     stream.write_all(bufferout.as_bytes())?;
     let mut smtp_object = smtp::SMTPStateMachine::default();
