@@ -36,7 +36,8 @@ enum DataType {
 enum HttpVersion {
     V11,
     V2,
-    V3
+    V3,
+    V09
 }
 
 #[derive(PartialEq, Debug)]
@@ -71,48 +72,52 @@ impl RequestParser {
     }
     
     fn parse_request_URI(&self, buffer: &[u8]) -> Option<String> {
-        let stringified_buffer = String::from_utf8(buffer.to_vec()).unwrap();   
+        let split_buff = buffer.split(|c| c == &b' ');
 
-        let lines = stringified_buffer.split("\n").collect::<Vec<&str>>();
-        if lines.len() == 0 {
+        // We only care about the first line, which should theoretically have 3 parts separated by a space character.
+        let split_buff : Vec<String> = split_buff.into_iter().take(3).map(|seg| {String::from_utf8(seg.to_vec()).unwrap()}).collect();
+
+        if split_buff.len() == 0 {
             return None
         }
-        let first_line = lines[0];
-        let parts = first_line.split(" ").collect::<Vec<&str>>();
-        if parts.len() < 3 {
-            return None
-        }
-        Some(parts[1].to_string())
+
+        Some(split_buff[1].clone())
     }
     
     fn parse_request_HTTP_version(&self, buffer: &[u8]) -> Option<HttpVersion>{
-        let stringified_buffer = String::from_utf8(buffer.to_vec()).unwrap();   
+        let split_buff : &[u8] = buffer
+            .split(|c| c == &b'\r')
+            .next().unwrap();
 
-        let lines = stringified_buffer.split("\r\n").collect::<Vec<&str>>();
-        if lines.len() == 0 {
-            return None
+        let split_buff : Vec<&[u8]>= split_buff.split(|c| c == &b' ').collect();
+        println!("split_buff: {:?}", split_buff);
+
+        if split_buff.len() != 3 {
+            // Assume 0.9.
+            return Some(HttpVersion::V09)
         }
-        let first_line = lines[0];
-        let parts = first_line.split(" ").collect::<Vec<&str>>();
-        if parts.len() < 3 {
-            return None
-        }
-        match parts[2] {
+
+        // chop off the dangling '\r\n' line ending, since before we only split on \r\n
+        let http_version = String::from_utf8(split_buff[2].to_vec()).unwrap();
+        match http_version.as_str() {
+            "HTTP/0.9" => Some(HttpVersion::V09),
             "HTTP/1.1" => Some(HttpVersion::V11),
+            "HTTP/2"   => Some(HttpVersion::V2),
+            "HTTP/3"   => Some(HttpVersion::V3),
             _ => return None
         }
     }
     
-    fn get_header(&self, post_request_form_urlencoded: &[u8]) -> Result<Vec<u8>, String> {
-        let upper_bound = post_request_form_urlencoded.len();
+    fn get_header(&mut self, buffer: &[u8]) -> Result<Vec<u8>, String> {
+        let upper_bound = buffer.len();
         let mut slice_start: usize = 0;
         let mut found = false;
         // scan from first set of bytes
-        let is_post = post_request_form_urlencoded.starts_with(b"POST");
+        let is_post = buffer.starts_with(b"POST");
         if is_post {
             while slice_start + 3 < upper_bound {
-                let current_slice = &post_request_form_urlencoded[slice_start..=slice_start+3];
-                let current_slice_string = String::from_utf8(current_slice.clone().to_vec()).unwrap();
+                let current_slice = &buffer[slice_start..=slice_start+3];
+                let current_slice_string = String::from_utf8(current_slice.to_vec()).unwrap();
                 println!("current slice: {:?}  v.s. {:?} --> current_slice_string: {}", current_slice, b"\r\n\r\n", current_slice_string);
                 if current_slice.starts_with(b"\r\n\r\n") {
                     found = true;
@@ -123,12 +128,11 @@ impl RequestParser {
             }
         }
         
-
         if found && is_post {
-            let header = post_request_form_urlencoded[..slice_start].to_vec();
+            let header = buffer[..slice_start].to_vec();
             Ok(header)
         } else {
-            Ok(post_request_form_urlencoded[..slice_start].to_vec())
+            Ok(buffer[..slice_start].to_vec())
         }
     }
 }
